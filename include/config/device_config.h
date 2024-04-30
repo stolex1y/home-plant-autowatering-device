@@ -7,6 +7,7 @@
 namespace hpa::config {
 
 struct DeviceConfig {
+  String base_topic;
   uint64_t sync_period;
   int16_t soil_moisture_min;
   int16_t soil_moisture_max;

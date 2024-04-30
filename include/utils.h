@@ -2,10 +2,31 @@
 #define HOME_PLANT_AUTOWATERING_DEVICE_UTILS_H
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
+
+#include <chrono>
 
 namespace hpa::utils {
 
 String Format(const char *format, ...);
+
+template <typename Period>
+bool convertToJson(const std::chrono::duration<int64_t, Period> &src, JsonVariant &dst) {
+  return dst.set(std::chrono::round<std::chrono::milliseconds>(src).count());
+}
+
+template <typename Period>
+bool convertFromJson(const JsonVariantConst &src, std::chrono::duration<int64_t, Period> &dst) {
+  if (src.isNull()) {
+    return false;
+  }
+  const auto millis_val = src.as<int64_t>();
+  const std::chrono::milliseconds millis_dur{millis_val};
+  dst = std::chrono::round<std::chrono::duration<int64_t, Period>>(millis_dur);
+  return true;
+}
+
+String FormatEpochSecondsAsDateTime(const std::chrono::seconds &epoch_sec);
 
 inline namespace chrono_literals {
 

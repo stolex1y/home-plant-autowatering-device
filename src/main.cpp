@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <AsyncMqttClient.h>
 #include <ESP8266WiFi.h>
 #include <ESPAsyncWebServer.h>
 
@@ -12,6 +13,7 @@
 #include "http/handlers/post_switch_mode_handler.h"
 #include "json.h"
 #include "logger.h"
+#include "ntp_client.h"
 #include "task_queue.h"
 #include "utils.h"
 #include "wifi.h"
@@ -30,6 +32,7 @@ const EepromManager::SizeType kDeviceConfigEndAddr = kEepromSize;
 const uint64_t kDefaultSyncPeriod = 10_s;
 const int16_t kDefaultSoilMoistureMin = INT16_MIN;
 const int16_t kDefaultSoilMoistureMax = INT16_MAX;
+const auto kDefaultBaseTopic = "autowatering";
 const auto kWebServerPort = 8080;
 
 EepromManager eeprom_manager{};
@@ -41,6 +44,7 @@ config::ConfigRepository<config::DeviceConfig> device_config_repo(
 );
 std::optional<config::CommonConfig> common_config;
 config::DeviceConfig device_config{
+    .base_topic = kDefaultBaseTopic,
     .sync_period = kDefaultSyncPeriod,
     .soil_moisture_min = kDefaultSoilMoistureMin,
     .soil_moisture_max = kDefaultSoilMoistureMax
@@ -52,6 +56,8 @@ std::optional<http::handlers::GetDeviceInfoHandler> get_device_info_handler;
 std::optional<http::handlers::PostCommonConfigHandler> post_common_config_handler;
 std::optional<http::handlers::GetConnectionStatusHandler> get_connection_status_handler;
 std::optional<http::handlers::PostSwitchModeHandler> post_switch_mode_handler;
+
+time::NtpClient ntp_client{};
 
 void setup() {
   if (LOG_LEVEL < static_cast<int>(logger::LogLevel::kNone)) {
@@ -80,9 +86,21 @@ void setup() {
 
     if (!wifi::sta::TryConnectToWifi(common_config->wifi_ssid, common_config->wifi_pass, 10_s)) {
       LOG_TRACE("couldn't connect to wifi, went to sleep on %llu ms", device_config.sync_period);
+      common_config_repo.ResetConfig();
+      delay(500);
+      ESP.restart();
       EspClass::deepSleep(device_config.sync_period * 1000);
     }
     LOG_DEBUG("successful connected to wifi");
+    ntp_client.Begin();
+    LOG_DEBUG(
+        "current time %s", utils::FormatEpochSecondsAsDateTime(ntp_client.NowSinceEpoch()).c_str()
+    );
+    delay(10_s);
+    LOG_DEBUG(
+        "current time after 10s %s",
+        utils::FormatEpochSecondsAsDateTime(ntp_client.NowSinceEpoch()).c_str()
+    );
   } else {
     LOG_INFO("ran in configuration mode");
     WiFi.mode(WIFI_AP_STA);
@@ -103,6 +121,7 @@ void setup() {
 }
 
 void loop() {
+  ntp_client.Update();
   while (auto task = task_queue.Pop()) {
     LOG_TRACE("call scheduled task in loop...");
     task.value()();
