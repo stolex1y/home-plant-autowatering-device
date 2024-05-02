@@ -16,6 +16,7 @@
 #include "mqtt/mqtt_client.h"
 #include "ntp_client.h"
 #include "pins/pin.h"
+#include "sensors/battery_charge_level_sensor.h"
 #include "task_queue.h"
 #include "utils.h"
 #include "wifi.h"
@@ -53,7 +54,8 @@ std::optional<http::handlers::PostSwitchModeHandler> post_switch_mode_handler;
 
 std::optional<time::NtpClient> ntp_client;
 std::optional<mqtt::MqttClient> mqtt_client;
-Ticker mqtt_reconnect_timer;
+
+sensors::BatteryChargeLevelSensor battery_charge_level_sensor;
 
 void ConnectToWifi(const config::WifiConfig &wifi_config) {
   if (!wifi::sta::TryConnectToWifi(
@@ -97,6 +99,9 @@ void setup() {
   }
   LOG_INFO("start");
 
+  Wire.begin();
+  battery_charge_level_sensor.Init();
+
   WiFi.setAutoConnect(false);
 
   const auto has_device_config = device_config_repo.HasConfig();
@@ -123,6 +128,9 @@ void setup() {
     LOG_TRACE(
         "saved config: %s", ToJsonString(common_config.value()).value_or("couldn't parse").c_str()
     );
+
+    battery_charge_level_sensor.Enable();
+
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(true);
 
@@ -168,6 +176,9 @@ void loop() {
     LOG_TRACE("mqtt is connected: %d", (int)connected);
     if (connected) {
       mqtt_client->Publish("test", 2, true, "hello");
+      mqtt_client->Publish(
+          "charge-level", 2, true, String(battery_charge_level_sensor.GetChargeLevel())
+      );
       delay(15000);
     }
   }
