@@ -17,6 +17,7 @@
 #include "ntp_client.h"
 #include "pins/pin.h"
 #include "sensors/battery_charge_level_sensor.h"
+#include "sensors/environment_sensor.h"
 #include "task_queue.h"
 #include "utils.h"
 #include "wifi.h"
@@ -56,6 +57,7 @@ std::optional<time::NtpClient> ntp_client;
 std::optional<mqtt::MqttClient> mqtt_client;
 
 sensors::BatteryChargeLevelSensor battery_charge_level_sensor;
+sensors::EnvironmentSensor environment_sensor;
 
 void ConnectToWifi(const config::WifiConfig &wifi_config) {
   if (!wifi::sta::TryConnectToWifi(
