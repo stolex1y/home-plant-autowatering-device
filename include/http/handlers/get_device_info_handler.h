@@ -13,7 +13,7 @@ class GetDeviceInfoHandler : public AsyncWebHandler {
   void handleRequest(AsyncWebServerRequest *request) override;
 
  private:
-  String response_{};
+  std::optional<String> response_;
 };
 
 }  // namespace hpa::http::handlers

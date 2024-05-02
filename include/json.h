@@ -43,9 +43,12 @@ bool SetJsonFromField(JsonVariant &json, const String &field_name, const T &fiel
 }
 
 template <typename T>
-String ToJsonString(const T &value) {
+std::optional<String> ToJsonString(const T &value) {
   JsonDocument json;
-  json.set(value);
+  if (!json.set(value)) {
+    LOG_DEBUG("couldn't convert to json");
+    return std::nullopt;
+  }
   String json_str;
   serializeJson(json, json_str);
   return json_str;
@@ -56,6 +59,7 @@ std::pair<DeserializationError, std::optional<T>> FromJsonString(const String &j
   JsonDocument json_doc;
   const auto error = deserializeJson(json_doc, json);
   if (error) {
+    LOG_DEBUG("couldn't parse json: %s", error.c_str());
     return std::make_pair(error, std::nullopt);
   }
   return std::make_pair(error, json_doc.as<T>());

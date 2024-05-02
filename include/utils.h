@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_UTILS_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_UTILS_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -27,6 +26,12 @@ bool convertFromJson(const JsonVariantConst &src, std::chrono::duration<int64_t,
 }
 
 String FormatEpochSecondsAsDateTime(const std::chrono::seconds &epoch_sec);
+
+std::pair<String, uint16_t> SeparateUrlToHostAndPort(const String &url);
+
+struct StringHash {
+  size_t operator()(const String &str) const;
+};
 
 inline namespace chrono_literals {
 
@@ -65,5 +70,3 @@ constexpr uint64_t operator""_s(uint64_t s) {
 }  // namespace chrono_literals
 
 }  // namespace hpa::utils
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_UTILS_H

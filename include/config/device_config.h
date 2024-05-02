@@ -4,13 +4,18 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
+#include "utils.h"
+
 namespace hpa::config {
 
+constexpr static const uint64_t kDefaultSyncPeriod = 20000;
+constexpr static const int16_t kDefaultSoilMoistureMin = INT16_MIN;
+constexpr static const int16_t kDefaultSoilMoistureMax = INT16_MAX;
+
 struct DeviceConfig {
-  String base_topic;
-  uint64_t sync_period;
-  int16_t soil_moisture_min;
-  int16_t soil_moisture_max;
+  uint64_t sync_period = kDefaultSyncPeriod;
+  int16_t soil_moisture_min = kDefaultSoilMoistureMin;
+  int16_t soil_moisture_max = kDefaultSoilMoistureMax;
 };
 
 bool convertToJson(const DeviceConfig &src, JsonVariant &dst);

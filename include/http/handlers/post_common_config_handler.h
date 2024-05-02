@@ -5,6 +5,7 @@
 
 #include "config/common_config.h"
 #include "config/config_repository.h"
+#include "http/update_configuration_request_dto.h"
 
 namespace hpa::http::handlers {
 
@@ -22,7 +23,7 @@ class PostCommonConfigHandler : public AsyncWebHandler {
 
  private:
   String request_body_;
-  std::optional<config::CommonConfig> common_config_;
+  std::optional<UpdateConfigurationRequestDto> request_dto_;
   config::ConfigRepository<config::CommonConfig> common_config_repository_;
 };
 

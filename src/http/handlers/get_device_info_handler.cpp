@@ -17,8 +17,13 @@ bool GetDeviceInfoHandler::canHandle(AsyncWebServerRequest *request) {
 
 void GetDeviceInfoHandler::handleRequest(AsyncWebServerRequest *request) {
   LOG_INFO("handle get device info request");
-  LOG_DEBUG("send OK response with body: %s", response_.c_str());
-  request->send(200, "application/json", response_);
+  if (!response_) {
+    LOG_ERROR("couldn't convert response to json");
+    request->send(500, "text/plain", "json conversion error");
+    return;
+  }
+  LOG_DEBUG("send OK response with body: %s", response_->c_str());
+  request->send(200, "application/json", response_.value());
 }
 
 }  // namespace hpa::http::handlers

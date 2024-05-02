@@ -15,7 +15,7 @@ bool TaskQueue::Push(Task task) {
 
 std::optional<Task> TaskQueue::Pop() {
   if (task_queue_.empty()) {
-    return {};
+    return std::nullopt;
   }
   auto task = task_queue_.front();
   task_queue_.pop();

@@ -1,5 +1,10 @@
 #include "utils.h"
 
+#include <IPAddress.h>
+
+#include <algorithm>
+#include <charconv>
+
 namespace hpa::utils {
 
 String Format(const char *format, ...) {
@@ -28,6 +33,28 @@ String FormatEpochSecondsAsDateTime(const std::chrono::seconds &epoch_sec) {
       utc_time.tm_sec
   );
   return buf;
+}
+
+std::pair<String, uint16_t> SeparateUrlToHostAndPort(const String &url) {
+  const auto separator = std::find(url.begin(), url.end(), ':');
+  if (separator == url.end()) {
+    return {url, 0};
+  }
+  uint16_t port = 0;
+  const auto res = std::from_chars(separator + 1, url.end(), port);
+  if (res.ec != std::errc()) {
+    return {url, 0};
+  }
+  return {url.substring(0, std::distance(url.begin(), separator)), port};
+}
+
+size_t StringHash::operator()(const String &str) const {
+  size_t h = 5381;
+  char c;
+  auto it = str.begin();
+  while ((c = *it++))
+    h = ((h << 5) + h) + c;
+  return h;
 }
 
 }  // namespace hpa::utils

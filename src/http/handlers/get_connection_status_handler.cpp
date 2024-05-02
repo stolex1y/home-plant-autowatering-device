@@ -15,9 +15,14 @@ void GetConnectionStatusHandler::handleRequest(AsyncWebServerRequest *request) {
   LOG_INFO("handle get connection status request");
   http::ConnectionStatusResponseDto response{};
   response.connected = wifi::sta::IsConnected();
-  String response_str = ToJsonString(response);
-  LOG_DEBUG("send OK response: %s", response_str.c_str());
-  request->send(200, "application/json", response_str);
+  const auto response_str = ToJsonString(response);
+  if (!response_str) {
+    LOG_ERROR("couldn't convert response to json");
+    request->send(500, "text/plain", "json conversion error");
+    return;
+  }
+  LOG_DEBUG("send OK response: %s", response_str->c_str());
+  request->send(200, "application/json", response_str.value());
 }
 
 }  // namespace hpa::http::handlers

@@ -4,15 +4,15 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
+#include "config/mqtt_config.h"
+#include "config/wifi_config.h"
+
 namespace hpa::config {
 
 struct CommonConfig {
+  MqttConfig mqtt_config;
+  WifiConfig wifi_config;
   String device_id;
-  String wifi_ssid;
-  String wifi_pass;
-  String mqtt_url;
-  String mqtt_username;
-  String mqtt_password;
 };
 
 bool convertToJson(const CommonConfig &src, JsonVariant &dst);

@@ -8,19 +8,19 @@
 
 namespace hpa::time {
 
-class NtpClient {
+class NtpClient : private NTPClient {
  public:
   using Duration = std::chrono::seconds;
 
+  explicit NtpClient();
+
   void Begin();
-
+  void End();
   void Update();
-
   Duration NowSinceEpoch();
 
  private:
   WiFiUDP ntp_udp_{};
-  NTPClient client_impl_{ntp_udp_};
 };
 
 }  // namespace hpa::time

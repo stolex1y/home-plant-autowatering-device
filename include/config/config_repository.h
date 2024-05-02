@@ -48,29 +48,43 @@ bool ConfigRepository<Config>::HasConfig() const {
 
 template <typename Config>
 std::optional<Config> ConfigRepository<Config>::ReadConfig() const {
+  if (!HasConfig()) {
+    return std::nullopt;
+  }
   EepromManager::SizeType addr = begin_addr_ + sizeof(kInitFlag_);
   const String config_str = eeprom_manager_.ReadData(addr);
   LOG_TRACE("read config: %s", config_str.c_str());
-  return FromJsonString<Config>(config_str).second;
+  auto config = FromJsonString<Config>(config_str).second;
+  if (!config) {
+    LOG_ERROR("couldn't parse config from json");
+    return std::nullopt;
+  }
+  return config;
 }
 
 template <typename Config>
 bool ConfigRepository<Config>::WriteConfig(const Config &config) {
   EepromManager::SizeType addr = begin_addr_ + sizeof(kInitFlag_);
-  String config_str = ToJsonString(config);
+  auto config_str = ToJsonString(config);
+  if (!config_str) {
+    LOG_ERROR("couldn't convert to json");
+    return false;
+  }
   if (sizeof(config) + addr > end_addr_) {
     LOG_ERROR("config size more than memory size");
     return false;
   }
-  eeprom_manager_.WriteData(addr, config_str);
-  eeprom_manager_.Commit();
-  const Config written_config = ReadConfig().value();
-  if (config != written_config) {
-    return false;
-  }
-  LOG_TRACE("wrote config: %s", config_str.c_str());
+  eeprom_manager_.WriteData(addr, config_str.value());
   SetInitFlag();
   eeprom_manager_.Commit();
+  const auto written_config = ReadConfig();
+  if (config != written_config) {
+    ResetInitFlag();
+    eeprom_manager_.Commit();
+    LOG_ERROR("written config isn't equals to source");
+    return false;
+  }
+  LOG_TRACE("wrote config: %s", config_str->c_str());
   return true;
 }
 

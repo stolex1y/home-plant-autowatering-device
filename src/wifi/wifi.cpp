@@ -1,6 +1,5 @@
 #include "wifi.h"
 
-#include "../include/wifi.h"
 #include "logger.h"
 
 namespace hpa::wifi {
