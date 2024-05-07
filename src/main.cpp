@@ -6,7 +6,6 @@
 #include "autopump.h"
 #include "config/common_config.h"
 #include "config/config_repository.h"
-#include "config/device_config.h"
 #include "http/handlers/get_connection_status_handler.h"
 #include "http/handlers/get_device_info_handler.h"
 #include "http/handlers/post_common_config_handler.h"
@@ -57,9 +56,7 @@ sensors::BatteryChargeLevelSensor battery_charge_level_sensor{};
 sensors::EnvironmentSensor environment_sensor{};
 sensors::LightLevelSensor light_level_sensor{};
 sensors::SoilMoistureSensor soil_moisture_sensor{kSoilMoistureSensorPin};
-pins::Pin soil_moisture_sensor_power(
-    kSensorsPowerPin, pins::PinType::kDigital, pins::PinMode::kOutputMode
-);
+pins::Pin sensors_power(kSensorsPowerPin, pins::PinType::kDigital, pins::PinMode::kOutputMode);
 
 std::optional<Autopump> autopump;
 std::optional<mqtt::readings::SensorReadingsRepository> sensors_readings_repo;
@@ -77,9 +74,7 @@ void ConnectToWifi(const config::WifiConfig &wifi_config) {
         "couldn't connect to wifi, went to sleep on %llu ms",
         common_config.device_config.sync_period
     );
-    delay(500);
-    //    EspClass::restart();
-    //    TODO: replace restart with deepSleep
+    delay(100);
     EspClass::deepSleep(common_config.device_config.sync_period * 1000);
   }
 }
@@ -109,7 +104,7 @@ void OnConfigUpdate(const std::optional<config::CommonConfig> &updated_config) {
 }
 
 void GoToDeepSleep() {
-  soil_moisture_sensor_power.SetState(0);
+  sensors_power.SetState(0);
   Serial.end();
   WiFi.disconnect(true);
   yield();
@@ -149,7 +144,7 @@ void setup() {
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(true);
 
-    soil_moisture_sensor_power.SetState(1);
+    sensors_power.SetState(1);
     battery_charge_level_sensor.Enable();
 
     ntp_client.emplace();
@@ -186,7 +181,6 @@ void setup() {
     sensors_readings_repo->SyncSensors();
     autopump->Enable();
 
-    // TODO go to sleep
     LOG_INFO("go to deep sleep");
     delay(100);
     GoToDeepSleep();

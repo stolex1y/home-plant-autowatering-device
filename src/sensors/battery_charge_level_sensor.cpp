@@ -33,7 +33,7 @@ std::optional<float> BatteryChargeLevelSensor::GetChargeLevel() const {
   LOG_TRACE("measuring time: %lu ms", (stop - start));
   LOG_TRACE("current charge level: %.02f%% (%.02f v)", charge_level, load_voltage_v);
 
-  return load_voltage_v;
+  return charge_level;
 }
 
 void BatteryChargeLevelSensor::Init() {
