@@ -1,6 +1,6 @@
-#include "task_queue.h"
+#include "utils/task_queue.h"
 
-namespace hpa::tasks {
+namespace hpa::utils {
 
 TaskQueue::TaskQueue(size_t capacity) : capacity_(capacity) {
 }
@@ -22,4 +22,4 @@ std::optional<Task> TaskQueue::Pop() {
   return task;
 }
 
-}  // namespace hpa::tasks
+}  // namespace hpa::utils

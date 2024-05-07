@@ -3,7 +3,7 @@
 #include "config/config_repository.h"
 #include "json.h"
 #include "logger.h"
-#include "wifi.h"
+#include "utils/wifi/wifi.h"
 
 namespace hpa::http::handlers {
 
@@ -41,7 +41,7 @@ void PostCommonConfigHandler::handleRequest(AsyncWebServerRequest *request) {
   }
   LOG_TRACE("wrote common config successfully");
 
-  wifi::sta::TryConnectToWifi(request_dto_->wifi_ssid, request_dto_->wifi_pass);
+  utils::wifi::sta::TryConnectToWifi(request_dto_->wifi_ssid, request_dto_->wifi_pass);
   request->send(200);
   LOG_DEBUG("send OK response");
 }
@@ -63,7 +63,7 @@ void PostCommonConfigHandler::handleBody(
     DeserializationError error;
     std::tie(error, request_dto_) = FromJsonString<UpdateConfigurationRequestDto>(request_body_);
     request_body_ = String();
-    if (error) {
+    if (error || !request_dto_) {
       LOG_INFO("couldn't deserialize request body: %s", error.c_str());
       return;
     }

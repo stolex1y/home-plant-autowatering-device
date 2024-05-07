@@ -1,12 +1,11 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_NTP_CLIENT_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_NTP_CLIENT_H
+#pragma once
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
 #include <chrono>
 
-namespace hpa::time {
+namespace hpa::utils {
 
 class NtpClient : private NTPClient {
  public:
@@ -17,12 +16,10 @@ class NtpClient : private NTPClient {
   void Begin();
   void End();
   void Update();
-  Duration NowSinceEpoch();
+  Duration NowSinceEpoch() const;
 
  private:
   WiFiUDP ntp_udp_{};
 };
 
-}  // namespace hpa::time
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_NTP_CLIENT_H
+}  // namespace hpa::utils

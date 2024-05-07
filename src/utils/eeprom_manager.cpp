@@ -1,8 +1,8 @@
-#include "eeprom_manager.h"
+#include "utils/eeprom_manager.h"
 
 #include "logger.h"
 
-namespace hpa {
+namespace hpa::utils {
 
 static const EepromManager::SizeType kMaxSize = 4096;
 
@@ -97,4 +97,4 @@ void EepromManager::Commit() {
   EEPROM.commit();
 }
 
-}  // namespace hpa
+}  // namespace hpa::utils

@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_JSON_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_JSON_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -7,7 +6,7 @@
 #include <utility>
 
 #include "logger.h"
-#include "utils.h"
+#include "utils/utils.h"
 
 namespace hpa {
 
@@ -66,5 +65,3 @@ std::pair<DeserializationError, std::optional<T>> FromJsonString(const String &j
 }
 
 }  // namespace hpa
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_JSON_H

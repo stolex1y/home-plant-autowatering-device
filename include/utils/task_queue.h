@@ -1,11 +1,10 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_TASK_QUEUE_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_TASK_QUEUE_H
+#pragma once
 
 #include <cinttypes>
 #include <functional>
 #include <queue>
 
-namespace hpa::tasks {
+namespace hpa::utils {
 
 using Task = std::function<void()>;
 
@@ -21,6 +20,4 @@ class TaskQueue {
   std::queue<Task> task_queue_;
 };
 
-}  // namespace hpa::tasks
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_TASK_QUEUE_H
+}  // namespace hpa::utils

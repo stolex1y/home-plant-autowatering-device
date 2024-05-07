@@ -7,13 +7,14 @@ namespace hpa::sensors {
 class BatteryChargeLevelSensor {
  public:
   void Init();
+  [[nodiscard]] std::optional<float> GetChargeLevel() const;
   void Enable();
   void Disable();
-  [[nodiscard]] float GetChargeLevel() const;
 
  private:
-  static constexpr const float kMinVoltage = 2.5;
-  static constexpr const float kMaxVoltage = 3.7;
+  static constexpr const uint64_t kMeasuringTimeout = 1000;
+  static constexpr const float kMinVoltage = 3.3;
+  static constexpr const float kMaxVoltage = 4.0;
 
   mutable INA219_WE sensor_;
 };

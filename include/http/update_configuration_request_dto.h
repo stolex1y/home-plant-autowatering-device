@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_UPDATE_CONFIGURATION_REQUEST_DTO_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_UPDATE_CONFIGURATION_REQUEST_DTO_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -23,5 +22,3 @@ bool convertFromJson(const JsonVariantConst &src, UpdateConfigurationRequestDto 
 bool convertToJson(const UpdateConfigurationRequestDto &src, JsonVariant &dst);
 
 }  // namespace hpa::http
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_UPDATE_CONFIGURATION_REQUEST_DTO_H

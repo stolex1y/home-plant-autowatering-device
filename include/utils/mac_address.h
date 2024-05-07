@@ -1,12 +1,11 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_MAC_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_MAC_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
 #include <cinttypes>
 
-namespace hpa {
+namespace hpa::utils {
 
 struct MacAddress {
   uint8_t groups[6];
@@ -14,6 +13,4 @@ struct MacAddress {
 
 bool convertToJson(const MacAddress &src, JsonVariant &dst);
 
-}  // namespace hpa
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_MAC_H
+}  // namespace hpa::utils

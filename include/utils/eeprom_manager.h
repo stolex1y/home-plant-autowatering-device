@@ -1,12 +1,11 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_EEPROM_MANAGER_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_EEPROM_MANAGER_H
+#pragma once
 
 #include <Arduino.h>
 #include <EEPROM.h>
 
 #include "logger.h"
 
-namespace hpa {
+namespace hpa::utils {
 
 class EepromManager {
  public:
@@ -119,6 +118,4 @@ void EepromManager::ReadData(SizeType address, T *const data, const SizeType dat
   return ReadDataAndMove(address_cpy, data, data_len);
 }
 
-}  // namespace hpa
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_EEPROM_MANAGER_H
+}  // namespace hpa::utils

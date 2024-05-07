@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "utils/utils.h"
 
 #include <IPAddress.h>
 
@@ -46,6 +46,14 @@ std::pair<String, uint16_t> SeparateUrlToHostAndPort(const String &url) {
     return {url, 0};
   }
   return {url.substring(0, std::distance(url.begin(), separator)), port};
+}
+
+std::optional<IPAddress> IpAddressFromString(const String &ip_str) {
+  IPAddress ip;
+  if (!ip.fromString(ip_str)) {
+    return std::nullopt;
+  }
+  return ip;
 }
 
 size_t StringHash::operator()(const String &str) const {

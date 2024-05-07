@@ -2,12 +2,12 @@
 
 #include "http/device_info_response_dto.h"
 #include "json.h"
-#include "wifi.h"
+#include "utils/wifi/wifi.h"
 
 namespace hpa::http::handlers {
 
 GetDeviceInfoHandler::GetDeviceInfoHandler() {
-  http::DeviceInfoResponseDto response{.mac = wifi::ap::GetMacAddress()};
+  http::DeviceInfoResponseDto response{.mac = utils::wifi::ap::GetMacAddress()};
   response_ = ToJsonString(response);
 }
 

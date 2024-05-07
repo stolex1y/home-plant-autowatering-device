@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_POST_COMMON_CONFIG_HANDLER_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_POST_COMMON_CONFIG_HANDLER_H
+#pragma once
 
 #include <ESPAsyncWebServer.h>
 
@@ -28,5 +27,3 @@ class PostCommonConfigHandler : public AsyncWebHandler {
 };
 
 }  // namespace hpa::http::handlers
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_POST_COMMON_CONFIG_HANDLER_H

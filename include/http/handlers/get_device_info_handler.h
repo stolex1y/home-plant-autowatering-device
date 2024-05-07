@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_GET_DEVICE_INFO_HANDLER_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_GET_DEVICE_INFO_HANDLER_H
+#pragma once
 
 #include <ESPAsyncWebServer.h>
 
@@ -17,5 +16,3 @@ class GetDeviceInfoHandler : public AsyncWebHandler {
 };
 
 }  // namespace hpa::http::handlers
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_GET_DEVICE_INFO_HANDLER_H

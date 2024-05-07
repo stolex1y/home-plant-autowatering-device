@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "logger.h"
-#include "utils.h"
+#include "utils/utils.h"
 
 namespace hpa::mqtt {
 
@@ -29,19 +29,24 @@ String MqttClient::DisconnectReasonToString(const AsyncMqttClientDisconnectReaso
   return "UNKNOWN";
 }
 
-MqttClient::MqttClient(const uint64_t keep_alive, const config::CommonConfig &config) {
+MqttClient::MqttClient(const uint64_t keep_alive, const config::CommonConfig &config)
+    : base_topic_(config.mqtt_config.base_topic + "/" + config.device_config.device_id + "/") {
   setKeepAlive(std::max<uint64_t>(1, keep_alive / 1000));
   setCredentials(config.mqtt_config.username.c_str(), config.mqtt_config.password.c_str());
   const auto [host, port] = utils::SeparateUrlToHostAndPort(config.mqtt_config.url);
-  IPAddress host_ip;
-  if (!host_ip.fromString(host)) {
+  const auto host_ip = utils::IpAddressFromString(host);
+  if (!host_ip) {
     LOG_ERROR("unknown host: %s", host.c_str());
     return;
   }
-  setServer(host_ip, port);
+  LOG_TRACE("set mqtt broker: %s:%d", host_ip.value().toString().c_str(), port);
+  setServer(host_ip.value(), port);
 
-  const auto will_topic = config.mqtt_config.base_topic + "/" + config.device_id;
-  setWill("will", 2, true, "died", 4);
+  /*
+    const auto will_topic = base_topic_ + config.mqtt_config.will_topic;
+    LOG_TRACE("will topic: %s", will_topic.c_str());
+    setWill(will_topic.c_str(), 2, true, "died", 4);
+  */
 
   onPublish([this](PacketId packet_id) {
     OnPublished(packet_id);
@@ -68,6 +73,10 @@ MqttClient::MqttClient(const uint64_t keep_alive, const config::CommonConfig &co
 }
 
 void MqttClient::Connect() {
+  if (connect_) {
+    return;
+  }
+
   LOG_DEBUG("connect to mqtt broker");
   connect_ = true;
   reconnecting_timer_.detach();
@@ -75,10 +84,14 @@ void MqttClient::Connect() {
 }
 
 void MqttClient::Disconnect() {
+  if (!connect_) {
+    return;
+  }
+
   LOG_DEBUG("disconnect from mqtt broker");
   connect_ = false;
   reconnecting_timer_.detach();
-  disconnect(true);
+  disconnect(false);
 }
 
 void MqttClient::OnConnected() {
@@ -86,6 +99,18 @@ void MqttClient::OnConnected() {
   for (auto &sub : subscriptions_) {
     LOG_TRACE("send subscribe msg to topic: %s", sub.topic.c_str());
     sub.packet_id = subscribe(sub.topic.c_str(), sub.qos);
+  }
+  while (!future_publications_.empty()) {
+    auto &pub = future_publications_.front();
+    LOG_TRACE("publish msg to topic: %s", pub.topic.c_str());
+    const auto packet_id =
+        publish(pub.topic.c_str(), pub.qos, pub.retain, pub.payload.c_str(), pub.payload.length());
+    publications_.emplace_back(Publication{
+        .topic = std::move(pub.topic),
+        .packet_id = packet_id,
+        .on_published = std::move(pub.on_published)
+    });
+    future_publications_.pop();
   }
 }
 
@@ -102,21 +127,23 @@ void MqttClient::OnDisconnected(const AsyncMqttClientDisconnectReason reason) {
 void MqttClient::Subscribe(
     const String &topic, const Qos qos, MqttClient::OnMessageCallback on_message
 ) {
-  LOG_DEBUG("subscribe to topic: %s", topic.c_str());
-  auto &subscription = GetSubscriptionOrPut(topic);
-  subscription.topic = topic;
+  const auto full_topic = base_topic_ + topic;
+  LOG_DEBUG("subscribe to topic: %s", full_topic.c_str());
+  auto &subscription = GetSubscriptionOrPut(full_topic);
+  subscription.topic = full_topic;
   subscription.on_message = std::move(on_message);
   subscription.qos = qos;
   if (connected()) {
-    subscription.packet_id = subscribe(topic.c_str(), qos);
+    subscription.packet_id = subscribe(subscription.topic.c_str(), subscription.qos);
   }
 }
 
 void MqttClient::Unsubscribe(const String &topic) {
-  LOG_DEBUG("unsubscribe from topic: %s", topic.c_str());
-  const auto sub = FindSubscription(topic);
+  const auto full_topic = base_topic_ + topic;
+  LOG_DEBUG("unsubscribe from topic: %s", full_topic.c_str());
+  const auto sub = FindSubscription(full_topic);
   if (sub) {
-    sub.value()->packet_id = unsubscribe(topic.c_str());
+    sub.value()->packet_id = unsubscribe(full_topic.c_str());
   }
 }
 
@@ -127,15 +154,45 @@ void MqttClient::Publish(
     const String &payload,
     std::optional<MqttClient::OnPublishCallback> on_publish
 ) {
-  LOG_DEBUG("publish message to topic: %s", topic.c_str());
-  const auto packet_id = publish(topic.c_str(), qos, retain, payload.c_str(), payload.length());
-  publications_.emplace_back(
-      Publication{.topic = topic, .packet_id = packet_id, .on_published = std::move(on_publish)}
-  );
+  const auto full_topic = base_topic_ + topic;
+  LOG_DEBUG("publish message to topic: %s", full_topic.c_str());
+  if (IsConnected()) {
+    const auto packet_id =
+        publish(full_topic.c_str(), qos, retain, payload.c_str(), payload.length());
+    publications_.emplace_back(Publication{
+        .topic = full_topic, .packet_id = packet_id, .on_published = std::move(on_publish)
+    });
+  } else {
+    future_publications_.emplace(FuturePublication{
+        .topic = full_topic,
+        .on_published = std::move(on_publish),
+        .qos = qos,
+        .payload = payload,
+        .retain = retain
+    });
+  }
 }
 
 bool MqttClient::IsConnected() const {
   return connected();
+}
+
+bool MqttClient::WaitFinishingAllPublications(uint64_t timeout) const {
+  const auto start = millis();
+  if (timeout == 0) {
+    return !HasPublications();
+  }
+  while (millis() - start < timeout) {
+    if (!HasPublications()) {
+      return true;
+    }
+    yield();
+  }
+  return !HasPublications();
+}
+
+bool MqttClient::HasPublications() const {
+  return !publications_.empty() || !future_publications_.empty();
 }
 
 void MqttClient::OnSubscribed(const PacketId packet_id) {

@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_GET_CONNECTION_STATUS_HANDLER_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_GET_CONNECTION_STATUS_HANDLER_H
+#pragma once
 
 #include <ESPAsyncWebServer.h>
 
@@ -12,5 +11,3 @@ class GetConnectionStatusHandler : public AsyncWebHandler {
 };
 
 }  // namespace hpa::http::handlers
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_GET_CONNECTION_STATUS_HANDLER_H

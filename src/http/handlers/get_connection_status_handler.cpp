@@ -3,7 +3,7 @@
 #include "http/connection_status_response_dto.h"
 #include "json.h"
 #include "logger.h"
-#include "wifi.h"
+#include "utils/wifi/wifi.h"
 
 namespace hpa::http::handlers {
 
@@ -14,7 +14,7 @@ bool GetConnectionStatusHandler::canHandle(AsyncWebServerRequest *request) {
 void GetConnectionStatusHandler::handleRequest(AsyncWebServerRequest *request) {
   LOG_INFO("handle get connection status request");
   http::ConnectionStatusResponseDto response{};
-  response.connected = wifi::sta::IsConnected();
+  response.connected = utils::wifi::sta::IsConnected();
   const auto response_str = ToJsonString(response);
   if (!response_str) {
     LOG_ERROR("couldn't convert response to json");

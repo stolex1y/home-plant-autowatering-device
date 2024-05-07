@@ -1,12 +1,12 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_WIFI_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_WIFI_H
+#pragma once
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 
-#include "mac_address.h"
+#include "config/wifi_config.h"
+#include "utils/mac_address.h"
 
-namespace hpa::wifi {
+namespace hpa::utils::wifi {
 
 namespace ap {
 
@@ -28,6 +28,4 @@ bool TryConnectToWifi(const String &ssid, const String &pass, uint64_t timeout =
 
 }  // namespace sta
 
-}  // namespace hpa::wifi
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_WIFI_H
+}  // namespace hpa::utils::wifi

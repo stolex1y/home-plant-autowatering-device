@@ -1,9 +1,9 @@
-#include "ntp_client.h"
+#include "utils/ntp_client.h"
 
 #include "logger.h"
-#include "utils.h"
+#include "utils/utils.h"
 
-namespace hpa::time {
+namespace hpa::utils {
 
 using namespace utils::chrono_literals;
 
@@ -27,8 +27,8 @@ void NtpClient::End() {
   end();
 }
 
-NtpClient::Duration NtpClient::NowSinceEpoch() {
+NtpClient::Duration NtpClient::NowSinceEpoch() const {
   return std::chrono::seconds(getEpochTime());
 }
 
-}  // namespace hpa::time
+}  // namespace hpa::utils

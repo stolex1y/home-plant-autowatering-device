@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <IPAddress.h>
 
 #include <chrono>
 
@@ -28,6 +29,8 @@ bool convertFromJson(const JsonVariantConst &src, std::chrono::duration<int64_t,
 String FormatEpochSecondsAsDateTime(const std::chrono::seconds &epoch_sec);
 
 std::pair<String, uint16_t> SeparateUrlToHostAndPort(const String &url);
+
+std::optional<IPAddress> IpAddressFromString(const String &ip_str);
 
 struct StringHash {
   size_t operator()(const String &str) const;

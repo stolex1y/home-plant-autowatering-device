@@ -6,10 +6,10 @@ namespace hpa::sensors {
 
 class EnvironmentSensor {
  public:
-  EnvironmentSensor();
-  [[nodiscard]] float GetTemperature() const;
-  [[nodiscard]] float GetPressure() const;
-  [[nodiscard]] float GetHumidity() const;
+  explicit EnvironmentSensor();
+  [[nodiscard]] std::optional<float> GetTemperature() const;
+  [[nodiscard]] std::optional<float> GetPressure() const;
+  [[nodiscard]] std::optional<float> GetHumidity() const;
 
  private:
   mutable GyverBME280 sensor_;

@@ -5,7 +5,7 @@
 namespace hpa::http::handlers {
 
 PostSwitchModeHandler::PostSwitchModeHandler(
-    tasks::TaskQueue &task_queue,
+    utils::TaskQueue &task_queue,
     const hpa::config::ConfigRepository<config::CommonConfig> &common_config_repository
 )
     : task_queue_(task_queue), common_config_repository_(common_config_repository) {

@@ -1,8 +1,8 @@
-#include "wifi.h"
+#include "utils/wifi/wifi.h"
 
 #include "logger.h"
 
-namespace hpa::wifi {
+namespace hpa::utils::wifi {
 
 namespace ap {
 
@@ -48,4 +48,4 @@ bool IsConnected() {
 
 }  // namespace sta
 
-}  // namespace hpa::wifi
+}  // namespace hpa::utils::wifi

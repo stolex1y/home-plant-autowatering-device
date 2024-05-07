@@ -1,6 +1,6 @@
-#include "mac_address.h"
+#include "utils/mac_address.h"
 
-namespace hpa {
+namespace hpa::utils {
 
 bool convertToJson(const MacAddress &src, JsonVariant &dst) {
   String str;
@@ -19,4 +19,4 @@ bool convertToJson(const MacAddress &src, JsonVariant &dst) {
   return dst.set(str);
 }
 
-}  // namespace hpa
+}  // namespace hpa::utils

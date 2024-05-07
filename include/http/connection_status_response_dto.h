@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_CONNECTION_STATUS_RESPONSE_DTO_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_CONNECTION_STATUS_RESPONSE_DTO_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -13,5 +12,3 @@ struct ConnectionStatusResponseDto {
 bool convertToJson(const ConnectionStatusResponseDto &src, JsonVariant &dst);
 
 }  // namespace hpa::http
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_CONNECTION_STATUS_RESPONSE_DTO_H

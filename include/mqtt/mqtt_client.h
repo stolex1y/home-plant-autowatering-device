@@ -1,12 +1,13 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_MQTT_CLIENT_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_MQTT_CLIENT_H
+#pragma once
 
 #include <Arduino.h>
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
 
+#include <queue>
+
 #include "config/common_config.h"
-#include "utils.h"
+#include "utils/utils.h"
 
 namespace hpa::mqtt {
 
@@ -32,6 +33,8 @@ class MqttClient : private AsyncMqttClient {
       std::optional<MqttClient::OnPublishCallback> on_publish = std::nullopt
   );
   [[nodiscard]] bool IsConnected() const;
+  [[nodiscard]] bool WaitFinishingAllPublications(uint64_t timeout) const;
+  [[nodiscard]] bool HasPublications() const;
 
  private:
   struct Subscription {
@@ -48,12 +51,22 @@ class MqttClient : private AsyncMqttClient {
     std::optional<OnPublishCallback> on_published;
   };
 
+  struct FuturePublication {
+    String topic;
+    std::optional<OnPublishCallback> on_published;
+    Qos qos;
+    String payload;
+    bool retain;
+  };
+
   static constexpr const uint64_t kDefaultReconnectDelay = 2000;
 
   std::vector<Subscription> subscriptions_{};
   std::vector<Publication> publications_{};
+  std::queue<FuturePublication> future_publications_{};
   bool connect_ = false;
   Ticker reconnecting_timer_;
+  String base_topic_;
 
   static String DisconnectReasonToString(AsyncMqttClientDisconnectReason reason);
 
@@ -77,5 +90,3 @@ class MqttClient : private AsyncMqttClient {
 };
 
 }  // namespace hpa::mqtt
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_MQTT_CLIENT_H

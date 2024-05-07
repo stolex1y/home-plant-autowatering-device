@@ -1,4 +1,4 @@
-#include "environment_sensor.h"
+#include "sensors/environment_sensor.h"
 
 #include "logger.h"
 
@@ -14,22 +14,34 @@ EnvironmentSensor::EnvironmentSensor() {
   }
 }
 
-float EnvironmentSensor::GetTemperature() const {
+std::optional<float> EnvironmentSensor::GetTemperature() const {
   LOG_DEBUG("get temperature");
   UpdateMeasurements();
-  return sensor_.readTemperature();
+  const auto reading = sensor_.readTemperature();
+  if (reading == 0) {
+    return std::nullopt;
+  }
+  return reading;
 }
 
-float EnvironmentSensor::GetPressure() const {
+std::optional<float> EnvironmentSensor::GetPressure() const {
   LOG_DEBUG("get pressure");
   UpdateMeasurements();
-  return sensor_.readPressure();
+  const auto reading = sensor_.readPressure();
+  if (reading == 0) {
+    return std::nullopt;
+  }
+  return reading;
 }
 
-float EnvironmentSensor::GetHumidity() const {
+std::optional<float> EnvironmentSensor::GetHumidity() const {
   LOG_DEBUG("get humidity");
   UpdateMeasurements();
-  return sensor_.readHumidity();
+  const auto reading = sensor_.readHumidity();
+  if (reading == 0) {
+    return std::nullopt;
+  }
+  return reading;
 }
 
 void EnvironmentSensor::UpdateMeasurements() const {

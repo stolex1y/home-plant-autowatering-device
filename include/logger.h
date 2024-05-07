@@ -1,5 +1,4 @@
-#ifndef HOME_PLANT_AUTOWATERING_DEVICE_LOGGER_H
-#define HOME_PLANT_AUTOWATERING_DEVICE_LOGGER_H
+#pragma once
 
 #include <Arduino.h>
 
@@ -28,44 +27,42 @@ enum class LogLevel : int {
 
 }  // namespace hpa::logger
 
-#define LOG_TRACE(...)                                                     \
-  if constexpr (LOG_LEVEL <= static_cast<int>(logger::LogLevel::kTrace)) { \
-    Serial.printf("[TRACE] [" __FILE__ ":%d]: ", __LINE__);                \
-    Serial.printf(__VA_ARGS__);                                            \
-    Serial.println();                                                      \
-  } else                                                                   \
+#define LOG_TRACE(...)                                                          \
+  if constexpr (LOG_LEVEL <= static_cast<int>(hpa::logger::LogLevel::kTrace)) { \
+    Serial.printf("[TRACE] [" __FILE__ ":%d] [%lu]: ", __LINE__, millis());     \
+    Serial.printf(__VA_ARGS__);                                                 \
+    Serial.println();                                                           \
+  } else                                                                        \
     NOOP
 
-#define LOG_DEBUG(...)                                                     \
-  if constexpr (LOG_LEVEL <= static_cast<int>(logger::LogLevel::kDebug)) { \
-    Serial.printf("[DEBUG] [" __FILE__ ":%d]: ", __LINE__);                \
-    Serial.printf(__VA_ARGS__);                                            \
-    Serial.println();                                                      \
-  } else                                                                   \
+#define LOG_DEBUG(...)                                                          \
+  if constexpr (LOG_LEVEL <= static_cast<int>(hpa::logger::LogLevel::kDebug)) { \
+    Serial.printf("[DEBUG] [" __FILE__ ":%d] [%lu]: ", __LINE__, millis());     \
+    Serial.printf(__VA_ARGS__);                                                 \
+    Serial.println();                                                           \
+  } else                                                                        \
     NOOP
 
-#define LOG_INFO(...)                                                     \
-  if constexpr (LOG_LEVEL <= static_cast<int>(logger::LogLevel::kInfo)) { \
-    Serial.printf("[INFO] [" __FILE__ ":%d]: ", __LINE__);                \
-    Serial.printf(__VA_ARGS__);                                           \
-    Serial.println();                                                     \
-  } else                                                                  \
+#define LOG_INFO(...)                                                          \
+  if constexpr (LOG_LEVEL <= static_cast<int>(hpa::logger::LogLevel::kInfo)) { \
+    Serial.printf("[INFO] [" __FILE__ ":%d] [%lu]: ", __LINE__, millis());     \
+    Serial.printf(__VA_ARGS__);                                                \
+    Serial.println();                                                          \
+  } else                                                                       \
     NOOP
 
-#define LOG_WARN(...)                                                     \
-  if constexpr (LOG_LEVEL <= static_cast<int>(logger::LogLevel::kWarn)) { \
-    Serial.printf("[WARN] [" __FILE__ ":%d]: ", __LINE__);                \
-    Serial.printf(__VA_ARGS__);                                           \
-    Serial.println();                                                     \
-  } else                                                                  \
+#define LOG_WARN(...)                                                          \
+  if constexpr (LOG_LEVEL <= static_cast<int>(hpa::logger::LogLevel::kWarn)) { \
+    Serial.printf("[WARN] [" __FILE__ ":%d] [%lu]: ", __LINE__, millis());     \
+    Serial.printf(__VA_ARGS__);                                                \
+    Serial.println();                                                          \
+  } else                                                                       \
     NOOP
 
-#define LOG_ERROR(...)                                                     \
-  if constexpr (LOG_LEVEL <= static_cast<int>(logger::LogLevel::kError)) { \
-    Serial.printf("[ERROR] [" __FILE__ ":%d]: ", __LINE__);                \
-    Serial.printf(__VA_ARGS__);                                            \
-    Serial.println();                                                      \
-  } else                                                                   \
+#define LOG_ERROR(...)                                                          \
+  if constexpr (LOG_LEVEL <= static_cast<int>(hpa::logger::LogLevel::kError)) { \
+    Serial.printf("[ERROR] [" __FILE__ ":%d] [%lu]: ", __LINE__, millis());     \
+    Serial.printf(__VA_ARGS__);                                                 \
+    Serial.println();                                                           \
+  } else                                                                        \
     NOOP
-
-#endif  // HOME_PLANT_AUTOWATERING_DEVICE_LOGGER_H
