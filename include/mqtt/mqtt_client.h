@@ -4,10 +4,9 @@
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
 
-#include <queue>
+#include <unordered_set>
 
 #include "config/common_config.h"
-#include "utils/utils.h"
 
 namespace hpa::mqtt {
 
@@ -29,7 +28,7 @@ class MqttClient : private AsyncMqttClient {
       const String &topic,
       Qos qos,
       bool retain,
-      const String &payload,
+      String payload,
       std::optional<MqttClient::OnPublishCallback> on_publish = std::nullopt
   );
   [[nodiscard]] bool IsConnected() const;
@@ -37,21 +36,21 @@ class MqttClient : private AsyncMqttClient {
   [[nodiscard]] bool HasPublications() const;
 
  private:
+  using PublicationId = uint64_t;
+
   struct Subscription {
     String topic;
     OnMessageCallback on_message;
-    Qos qos;
-    PacketId packet_id;
     String message_buf;
   };
 
-  struct Publication {
+  struct FutureSubscription {
     String topic;
-    PacketId packet_id;
-    std::optional<OnPublishCallback> on_published;
+    OnMessageCallback on_message;
+    Qos qos;
   };
 
-  struct FuturePublication {
+  struct Publication {
     String topic;
     std::optional<OnPublishCallback> on_published;
     Qos qos;
@@ -61,9 +60,13 @@ class MqttClient : private AsyncMqttClient {
 
   static constexpr const uint64_t kDefaultReconnectDelay = 2000;
 
-  std::vector<Subscription> subscriptions_{};
-  std::vector<Publication> publications_{};
-  std::queue<FuturePublication> future_publications_{};
+  static uint64_t next_publication_id_;
+
+  std::unordered_map<PublicationId, Publication> publications_{};
+  std::unordered_map<PacketId, PublicationId> publication_packets_{};
+  std::unordered_map<String, FutureSubscription, utils::StringHash> future_subscriptions_{};
+  std::unordered_map<PacketId, std::reference_wrapper<String>> subscription_packets_{};
+  std::unordered_map<String, Subscription, utils::StringHash> subscriptions_{};
   bool connect_ = false;
   Ticker reconnecting_timer_;
   String base_topic_;
@@ -83,10 +86,6 @@ class MqttClient : private AsyncMqttClient {
       size_t index,
       size_t total
   );
-  Subscription &GetSubscriptionOrPut(const String &topic);
-  std::optional<std::vector<Subscription>::iterator> FindSubscription(PacketId packet_id);
-  std::optional<std::vector<Subscription>::iterator> FindSubscription(const String &topic);
-  std::optional<std::vector<Publication>::iterator> FindPublication(PacketId packet_id);
 };
 
 }  // namespace hpa::mqtt

@@ -35,6 +35,8 @@ void ConfigRemoteRepository::HandleMessage(const String &payload) {
     LOG_ERROR("couldn't find common config");
     return;
   }
+  LOG_DEBUG("erase retained config message");
+  mqtt_client_.Publish(config_topic_, 2, true, "");
 
   DeserializationError error;
   std::optional<ConfigDto> config_dto;

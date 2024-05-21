@@ -11,7 +11,6 @@ using namespace utils::chrono_literals;
 
 constexpr static const auto kDefaultReconnectTimeout = 15_s;
 constexpr static const auto kDefaultApLocalIp = "192.168.100.100";
-constexpr static const auto kDefaultApGatewayIp = "192.168.100.1";
 constexpr static const auto kDefaultApSubnet = "255.255.255.0";
 
 struct WifiConfig {
@@ -19,7 +18,6 @@ struct WifiConfig {
   String wifi_pass;
   uint64_t reconnect_timeout = kDefaultReconnectTimeout;
   String ap_local_ip = kDefaultApLocalIp;
-  String ap_gateway_ip = kDefaultApGatewayIp;
   String ap_subnet = kDefaultApSubnet;
 };
 

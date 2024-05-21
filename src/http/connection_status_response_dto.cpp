@@ -5,7 +5,7 @@
 namespace hpa::http {
 
 bool convertToJson(const ConnectionStatusResponseDto &src, JsonVariant &dst) {
-  return SetJsonFromField<decltype(src.connected)>(dst, "connected", src.connected);
+  return SetJsonFromField(dst, "connected", src.connected);
 }
 
 }  // namespace hpa::http

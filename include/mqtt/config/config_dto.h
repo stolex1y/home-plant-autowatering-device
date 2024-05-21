@@ -8,7 +8,8 @@ namespace hpa::mqtt::config {
 
 struct ConfigDto {
   float soil_moisture_min;
-  float soil_moisture_max;
+  uint64_t pump_time;
+  uint64_t pump_delay;
   uint64_t sync_period;
 
   void UpdateConfig(::hpa::config::CommonConfig &common_config) const;

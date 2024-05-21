@@ -180,6 +180,9 @@ void setup() {
     mqtt_client->Connect();
     sensors_readings_repo->SyncSensors();
     autopump->Enable();
+    if (!mqtt_client->WaitFinishingAllPublications(10_s)) {
+      LOG_ERROR("didn't wait for all the messages to be published");
+    }
 
     LOG_INFO("go to deep sleep");
     delay(100);

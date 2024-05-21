@@ -24,7 +24,7 @@ Autopump::Autopump(
 void Autopump::Enable() {
   LOG_TRACE("enable autopump");
   const auto soil_moisture = soil_moisture_sensor_.GetSoilMoisture();
-  if (soil_moisture < static_cast<float>(device_config_.soil_moisture_min)) {
+  if (soil_moisture < device_config_.soil_moisture_min) {
     LOG_TRACE("need pump");
     const auto last_pump = pump_state_repository_.GetLastPumpTime();
     const auto now = ntp_client_.NowSinceEpoch();

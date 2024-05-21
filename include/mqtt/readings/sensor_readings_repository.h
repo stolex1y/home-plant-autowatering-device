@@ -25,7 +25,7 @@ class SensorReadingsRepository {
   void SyncSensors();
 
  private:
-  static constexpr const auto kMaxWaitTime = 20_s;
+  static constexpr const auto kMaxWaitTime = 10_s;
 
   mqtt::MqttClient &mqtt_client_;
   const sensors::SoilMoistureSensor &soil_moisture_sensor_;

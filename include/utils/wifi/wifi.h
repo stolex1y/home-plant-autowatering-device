@@ -11,7 +11,7 @@ namespace hpa::utils::wifi {
 namespace ap {
 
 const IPAddress kLocalIp(192, 168, 100, 100);
-const IPAddress kGatewayIp(192, 168, 100, 1);
+const IPAddress kGatewayIp(0, 0, 0, 0);
 const IPAddress kSubnet(255, 255, 255, 0);
 const auto kSsid = "HPA Device";
 
